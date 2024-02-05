@@ -1,0 +1,110 @@
+* {
+  line-height: 1.6em;
+}
+
+q {
+  display: block;
+  max-width: 30em;
+  margin: 1em auto;
+  font-style: italic;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+.content-wrapper {
+  margin: 1em auto;
+  max-width: 50em;
+}
+
+h1 {
+  text-align: center;
+}
+
+.input-wrapper label {
+  display: block;
+  padding: 1em 0;
+}
+
+input[type="number"],
+.input-wrapper {
+  background-color: white;
+  display: flex;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 0.2em;
+  padding: 0.5em;
+  gap: 1em;
+}
+
+input[type="number"] {
+  padding: 0.5em;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  flex-grow: 1;
+}
+
+table {
+  width: 100%;
+}
+
+.desc {
+  color: gray;
+}
+
+details.button {
+  max-width: 30em;
+  margin: 0 auto;
+  border-radius: 0.5em;
+  overflow: hidden;
+}
+
+summary {
+  cursor: pointer;
+}
+
+details.button summary,
+details.button > div {
+  background-color: #e5f0f7;
+  padding: 1em;
+}
+
+details.button:not([open]) summary:hover {
+  background-color: #edf6fc;
+}
+
+details.button > div {
+  max-height: 60vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.setting-wrapper {
+  margin: 0 0 2em 0;
+}
+
+footer > * {
+  font-size: 0.8em;
+}
+
+footer {
+  padding-top: 1em;
+  color: gray;
+}
+
+footer h1,
+footer h2,
+footer h3 {
+  font-size: inherit;
+}
+
+a {
+  text-decoration: underline;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: none;
+}
