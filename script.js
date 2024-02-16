@@ -208,7 +208,7 @@ function update() {
         kontoGeldanlageEinzahlungenMietus + kontoGeldanlageRenditeMietus
       )}&nbsp;€ aufbauen. Sie mussten ${prettifyNumber(
         kontoKapitalertragsteuerMietus
-      )}&nbsp;€ Kapitalertragssteuer bezahlen.</p><p>Grundsätzlich müssen beide Familien eine Kapitalertragssteuer von ${prettifyNumber(
+      )}&nbsp;€ Kapitalertragsteuer bezahlen.</p><p>Grundsätzlich müssen beide Familien eine Kapitalertragsteuer von ${prettifyNumber(
         kapitalertragssteuer * 100,
         2
       )}&nbsp;% (Solidaritätszuschlag mit inbegriffen) auf die Rendite ihrer Geldanlage bezahlen. Die ersten ${prettifyNumber(
@@ -246,7 +246,7 @@ function update() {
     (100 * kontoGeldanlageRenditeKaufus) / (1 - kapitalertragssteuer) / kontoGeldanlageEinzahlungenKaufus
   )} % Rendite)</li><li>abzgl. ${prettifyNumber(
     (kontoGeldanlageRenditeKaufus / (1 - kapitalertragssteuer)) * kapitalertragssteuer
-  )}&nbsp;€ Kapitalertragssteuer</li>${
+  )}&nbsp;€ Kapitalertragsteuer</li>${
     kontoSchulden > 0
       ? `<li>abzgl. Restschuld ${prettifyNumber(
           kontoSchulden
@@ -260,7 +260,7 @@ function update() {
     (100 * kontoGeldanlageRenditeMietus) / (1 - kapitalertragssteuer) / kontoGeldanlageEinzahlungenMietus
   )} % Rendite)</li><li>abzgl. ${prettifyNumber(
     (kontoGeldanlageRenditeMietus / (1 - kapitalertragssteuer)) * kapitalertragssteuer
-  )}&nbsp;€ Kapitalertragssteuer</li><li><strong>Guthaben: ${prettifyNumber(
+  )}&nbsp;€ Kapitalertragsteuer</li><li><strong>Guthaben: ${prettifyNumber(
     vermoegenMietus
   )}&nbsp;€</strong></li></ul>`;
 
@@ -286,11 +286,11 @@ function update() {
     kontoInstandhaltung
   )}&nbsp;€</li><li>Zinszahlungen ${prettifyNumber(
     kontoZinszahlungen
-  )}&nbsp;€</li><li>Kapitalertragssteuer ${prettifyNumber(
+  )}&nbsp;€</li><li>Kapitalertragsteuer ${prettifyNumber(
     kontoKapitalertragsteuerKaufus
   )}&nbsp;€</li></ul><p>Für Familie Mietus hingegen fielen folgende Kosten an:</p><ul><li>Mietzahlungen ${prettifyNumber(
     kontoMietzahlungen
-  )}&nbsp;€</li><li>Kapitalertragssteuer ${prettifyNumber(kontoKapitalertragsteuerMietus)}&nbsp;€</li></ul>`;
+  )}&nbsp;€</li><li>Kapitalertragsteuer ${prettifyNumber(kontoKapitalertragsteuerMietus)}&nbsp;€</li></ul>`;
 
   if (resultKaufus > resultMietus) {
     detailsHTML += `<h2>Ist Kaufen also besser?</h2>`;
