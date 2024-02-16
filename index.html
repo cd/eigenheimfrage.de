@@ -83,15 +83,20 @@
           </p>
         </div>
         <div class="setting-wrapper">
-          <label for="wertentwicklung">Immobilienwert nach 50 Jahren</label>
+          <label for="wertentwicklung">Wertsteigerung der Immobilie pro Jahr</label>
           <div class="input-wrapper">
-            <input type="number" id="wertentwicklung" step="1" value="360" min="0" max="1000" />
+            <input type="number" id="wertentwicklung" step="0.1" value="1.6" min="-20" max="20" />
             <span>%</span>
           </div>
           <p class="desc">
-            Wie soll sich der (nominelle) Wert der Immobilie über einen Zeitraum von 50 Jahren entwickeln? Der
-            voreingestellte Wert von 360 % entspricht in etwa der Preisentwicklung der letzten 50 Jahre für Immobilien
-            in Deutschland.
+            Wie soll sich der (nominelle) Zeitwert der Immobilie pro Jahr verändern? Der voreingestellte Wert entspricht
+            in etwa der durchschnittlichen Preisentwicklung deutscher Immobilien in den letzten 50 Jahren (2,6 % pro
+            Jahr) abzüglich eines Altersabschlages von 1 %. Der Altersabschlag ist notwendig, weil die konkrete
+            Immobilie der Familie Kaufus, trotz Instandhaltungsmaßnahmen, zwangsläufig in die Jahre kommen wird und
+            aller Wahrscheinlichkeit nach der Entwicklung des allgemeinen Immobilienmarktes hinterherlaufen wird.
+          </p>
+          <p class="desc">
+            Auch negative Werte sind möglich, sofern du von einer nominellen Wertminderung der Immobilie ausgehst.
           </p>
         </div>
         <div class="setting-wrapper">

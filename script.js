@@ -19,7 +19,7 @@ function update() {
 
   const zeitraum = 50;
   const darlehen = (1 + kaufnebenkosten / 100) * kaufpreis - startkapital;
-  const wertentwicklungFaktorMonat = Math.pow(wertentwicklung / 100, 1 / zeitraum / 12);
+  const wertentwicklungFaktorMonat = wertentwicklung / 100 / 12 + 1;
   const kapitalertragssteuer = 0.26375;
   const steuerfreibetrag = 1000;
 
