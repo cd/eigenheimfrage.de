@@ -20,6 +20,8 @@ function update() {
   const zeitraum = 50;
   const darlehen = (1 + kaufnebenkosten / 100) * kaufpreis - startkapital;
   const wertentwicklungFaktorMonat = Math.pow(wertentwicklung / 100, 1 / zeitraum / 12);
+  const kapitalertragssteuer = 0.26375;
+  const steuerfreibetrag = 1000;
 
   const bankRate = Math.round((tilgungsrate / 100 / 12) * darlehen + (kreditzins / 100 / 12) * darlehen);
   const vermoegensentwicklungKaufus = [];
@@ -35,6 +37,12 @@ function update() {
   let kontoGeldanlageRenditeMietus = 0;
   let kontoMietzahlungen = 0;
   let kontoInstandhaltung = 0;
+  let kontoKapitalertragsteuerKaufus = 0;
+  let kontoKapitalertragsteuerMietus = 0;
+  let kontoKapitalertragsteuerFreibetragKaufus = 0;
+  let kontoKapitalertragsteuerFreibetragMietus = 0;
+  let jahresfreibetragVerbleibendKaufus = 0;
+  let jahresfreibetragVerbleibendMietus = 0;
   let wertImmobilie = kaufpreis;
   let vermoegenKaufus = startkapital;
   let vermoegenMietus = startkapital;
@@ -95,10 +103,36 @@ function update() {
 
     // Bei beiden Familien wird zusätzlich jegliche Rendite, die aus der Geldanlage stammt, reinvestiert.
     // Dieses Geld wird auf einem Extra-Konto geführt, damit man in der Auswertung die Rendite berechnen kann.
-    kontoGeldanlageRenditeKaufus +=
+    // Weiterhin fällt auf die Reinvestition noch eine Steuer an, sofern der Jahresfreibetrag überschritten ist.
+    if (monat % 12 === 0) {
+      // Neues Jahr - neuer Freibetrag
+      jahresfreibetragVerbleibendKaufus = steuerfreibetrag;
+      jahresfreibetragVerbleibendMietus = steuerfreibetrag;
+    }
+    const renditeKaufusBrutto =
       (kontoGeldanlageRenditeKaufus + kontoGeldanlageEinzahlungenKaufus) * (anlagezins / 100 / 12);
-    kontoGeldanlageRenditeMietus +=
+    const renditeMietusBrutto =
       (kontoGeldanlageRenditeMietus + kontoGeldanlageEinzahlungenMietus) * (anlagezins / 100 / 12);
+    const zuVersteuerndeRenditeKaufus = Math.max(renditeKaufusBrutto - jahresfreibetragVerbleibendKaufus, 0);
+    const zuVersteuerndeRenditeMietus = Math.max(renditeMietusBrutto - jahresfreibetragVerbleibendMietus, 0);
+    const genutzterFreibetragKaufus = renditeKaufusBrutto - zuVersteuerndeRenditeKaufus;
+    const genutzterFreibetragMietus = renditeMietusBrutto - zuVersteuerndeRenditeMietus;
+    jahresfreibetragVerbleibendKaufus -= genutzterFreibetragKaufus;
+    jahresfreibetragVerbleibendMietus -= genutzterFreibetragMietus;
+    const zuZahlendeSteuerKaufus = zuVersteuerndeRenditeKaufus * kapitalertragssteuer;
+    const zuZahlendeSteuerMietus = zuVersteuerndeRenditeMietus * kapitalertragssteuer;
+    kontoKapitalertragsteuerFreibetragKaufus += genutzterFreibetragKaufus;
+    kontoKapitalertragsteuerFreibetragMietus += genutzterFreibetragMietus;
+    kontoKapitalertragsteuerKaufus += zuZahlendeSteuerKaufus;
+    kontoKapitalertragsteuerMietus += zuZahlendeSteuerMietus;
+    kontoGeldanlageRenditeKaufus += renditeKaufusBrutto - zuZahlendeSteuerKaufus;
+    kontoGeldanlageRenditeMietus += renditeMietusBrutto - zuZahlendeSteuerMietus;
+
+    // Am Ende des Betrachtungszeitraums werden die Geldanlagen aufgelöst und auf die Gewinne fallen Steuern an.
+    if (zeitraum * 12 === monat) {
+      kontoGeldanlageRenditeKaufus *= 1 - kapitalertragssteuer;
+      kontoGeldanlageRenditeMietus *= 1 - kapitalertragssteuer;
+    }
 
     // Berechnung der Vermögen
     vermoegenKaufus = wertImmobilie + kontoGeldanlageEinzahlungenKaufus + kontoGeldanlageRenditeKaufus - kontoSchulden;
@@ -172,68 +206,91 @@ function update() {
           : "noch nichts"
       } in ihre Geldanlage investieren.</p><p>Familie Mietus hingegen konnte mit ihrer Geldanlage inzwischen ein Vermögen von ${prettifyNumber(
         kontoGeldanlageEinzahlungenMietus + kontoGeldanlageRenditeMietus
-      )}&nbsp;€ aufbauen.</p><h2>Vermögensentwicklung über die Jahre</h2><canvas id="myChart"></canvas>`;
+      )}&nbsp;€ aufbauen. Sie mussten ${prettifyNumber(
+        kontoKapitalertragsteuerMietus
+      )}&nbsp;€ Kapitalertragssteuer bezahlen.</p><p>Grundsätzlich müssen beide Familien eine Kapitalertragssteuer von ${prettifyNumber(
+        kapitalertragssteuer * 100,
+        2
+      )}&nbsp;% (Solidaritätszuschlag mit inbegriffen) auf die Rendite ihrer Geldanlage bezahlen. Die ersten ${prettifyNumber(
+        steuerfreibetrag
+      )}&nbsp;€ im Jahr sind jedoch steuerfrei.</p><h2>Vermögensentwicklung über die Jahre</h2><canvas id="myChart"></canvas>`;
     }
 
     if (!meldungSchuldenfrei && kontoSchulden < 1) {
-      meldungSchuldenfrei = `Nach ${prettifyNumber(
+      meldungSchuldenfrei = `<p>Nach ${prettifyNumber(
         monat / 12,
         1
-      )} Jahren hat Familie Kaufus das Darlehen vollständig zurückgezahlt. Von nun an müssen sie nur noch die Instandhaltungskosten der Immobilie tragen.`;
+      )} Jahren hat Familie Kaufus das Darlehen vollständig zurückgezahlt. Von nun an müssen sie nur noch die Instandhaltungskosten der Immobilie tragen und können mehr Geld in ihre Geldanlage investieren.</p>`;
     }
   }
 
   if (meldungSchuldenfrei) {
-    detailsHTML += `<p>${meldungSchuldenfrei}</p>`;
+    detailsHTML += meldungSchuldenfrei;
   } else {
     detailsHTML += `<p>Über den gesamten Zeitzeit hat Familie Kaufus es nicht geschafft, das Darlehen vollständig zurückzuzahlen. Nach 50 Jahren ist noch ein Betrag von ${prettifyNumber(
       kontoSchulden
     )}&nbsp;€ offen.</p>`;
   }
 
-  detailsHTML += `<p>Nach 50 Jahren verfügt Familie Kaufus über ein Gesamtvermögen von ${prettifyNumber(
-    vermoegenKaufus
-  )}&nbsp;€, welches sich wie folgt zusammensetzt:</p><ul><li>Immobilienwert ${prettifyNumber(
+  detailsHTML += `<h2>Ergebnis nach 50 Jahren</h2><p>Beide Familien sind mit ${prettifyNumber(
+    startkapital
+  )}&nbsp;€ gestartet. Um beide Szenanieren am Ende des Betrachtungszeitraumes wieder sinnvoll miteinander vergleichen zu können, verkaufen beide Familien ihr Hab und Gut und machen einen Kassensturz:</p>`;
+
+  detailsHTML += `<p>Familie Kaufus:</p><ul><li>(Steuerfreier) Immobilienverkauf ${prettifyNumber(
     wertImmobilie
   )}&nbsp;€ (${prettifyNumber(
     ((wertImmobilie - kaufpreis) / kaufpreis) * 100
-  )} % Wertsteigerung)</li><li>Geldanlage ${prettifyNumber(
-    kontoGeldanlageEinzahlungenKaufus + kontoGeldanlageRenditeKaufus
+  )} % Wertsteigerung)</li><li>Auflösung Geldanlage ${prettifyNumber(
+    kontoGeldanlageEinzahlungenKaufus + kontoGeldanlageRenditeKaufus / (1 - kapitalertragssteuer)
   )}&nbsp;€ (${prettifyNumber(
-    (100 * kontoGeldanlageRenditeKaufus) / kontoGeldanlageEinzahlungenKaufus
-  )} % Rendite)</li>${
-    kontoSchulden > 0 ? `<li>- Restschuld ${prettifyNumber(kontoSchulden)}&nbsp;€</li>` : ``
-  }</ul><p>Familie Mietus hingegen kann nach 50 Jahren ein Vermögen von ${prettifyNumber(
-    vermoegenMietus
-  )}&nbsp;€ vorweisen, welches sich wie folgt zusammensetzt:</p><ul><li>Geldanlage ${prettifyNumber(
-    kontoGeldanlageEinzahlungenMietus + kontoGeldanlageRenditeMietus
+    (100 * kontoGeldanlageRenditeKaufus) / (1 - kapitalertragssteuer) / kontoGeldanlageEinzahlungenKaufus
+  )} % Rendite)</li><li>abzgl. ${prettifyNumber(
+    (kontoGeldanlageRenditeKaufus / (1 - kapitalertragssteuer)) * kapitalertragssteuer
+  )}&nbsp;€ Kapitalertragssteuer</li>${
+    kontoSchulden > 0
+      ? `<li>abzgl. Restschuld ${prettifyNumber(
+          kontoSchulden
+        )}&nbsp;€</li><li>abzgl. Vorfälligkeitsentschädigung (noch nicht im Kalkulator berücksichtigt!)</li>`
+      : ``
+  }<li><strong>Guthaben: ${prettifyNumber(
+    vermoegenKaufus
+  )}&nbsp;€</strong></li></ul><p>Familie Mietus:</p><ul><li>Auflösung Geldanlage ${prettifyNumber(
+    kontoGeldanlageEinzahlungenMietus + kontoGeldanlageRenditeMietus / (1 - kapitalertragssteuer)
   )} € (${prettifyNumber(
-    (100 * kontoGeldanlageRenditeMietus) / kontoGeldanlageEinzahlungenMietus
-  )} % Rendite)</li></ul>`;
+    (100 * kontoGeldanlageRenditeMietus) / (1 - kapitalertragssteuer) / kontoGeldanlageEinzahlungenMietus
+  )} % Rendite)</li><li>abzgl. ${prettifyNumber(
+    (kontoGeldanlageRenditeMietus / (1 - kapitalertragssteuer)) * kapitalertragssteuer
+  )}&nbsp;€ Kapitalertragssteuer</li><li><strong>Guthaben: ${prettifyNumber(
+    vermoegenMietus
+  )}&nbsp;€</strong></li></ul>`;
 
   const resultKaufus = Math.round((10 * vermoegenKaufus) / vermoegenMietus) / 10;
   const resultMietus = Math.round((10 * vermoegenMietus) / vermoegenKaufus) / 10;
   if (resultKaufus > resultMietus) {
-    detailsHTML += `<p style="border:1px solid black;padding: 0.5em;"><strong>Familie resultKaufus konnte im gleichen Zeitraum bei gleichen Startbedingungen also ${prettifyNumber(
+    detailsHTML += `<p style="border:1px solid black;padding: 0.5em;background-color:#e5f0f7;"><strong>Familie Kaufus konnte im gleichen Zeitraum bei gleichen Startbedingungen also ${prettifyNumber(
       resultKaufus,
       1
     )}-mal so viel Vermögen aufbauen wie Familie Mietus.</strong></p>`;
   } else if (resultKaufus < resultMietus) {
-    detailsHTML += `<p style="border:1px solid black;padding: 0.5em;"><strong>Familie Mietus konnte im gleichen Zeitraum bei gleichen Startbedingungen also ${prettifyNumber(
+    detailsHTML += `<p style="border:1px solid black;padding: 0.5em;background-color:#e5f0f7;"><strong>Familie Mietus konnte im gleichen Zeitraum bei gleichen Startbedingungen also ${prettifyNumber(
       resultMietus,
       1
     )}-mal so viel Vermögen aufbauen wie Familie Kaufus.</strong></p>`;
   } else {
-    detailsHTML += `<p style="border:1px solid black;padding: 0.5em;"><strong>Beide Familien konnten im gleichen Zeitraum bei gleichen Startbedingungen in etwa gleich viel Vermögen aufbauen.</strong></p>`;
+    detailsHTML += `<p style="border:1px solid black;padding: 0.5em;background-color:#e5f0f7;"><strong>Beide Familien konnten im gleichen Zeitraum bei gleichen Startbedingungen in etwa gleich viel Vermögen aufbauen.</strong></p>`;
   }
 
-  detailsHTML += `<p>Während des gesamten Zeitraumes hat Familie Kaufus insgesamt ${prettifyNumber(
+  detailsHTML += `<p>Während des gesamten Zeitraumes fielen für Familie Kaufus folgende Kosten an:</p><ul><li>Kaufnebenkosten ${prettifyNumber(
+    (kaufnebenkosten / 100) * kaufpreis
+  )}&nbsp;€</li><li>Instandhaltungskosten ${prettifyNumber(
     kontoInstandhaltung
-  )}&nbsp;€ aufgewendet, um die Immobilie instand zu halten und insgesamt ${prettifyNumber(
+  )}&nbsp;€</li><li>Zinszahlungen ${prettifyNumber(
     kontoZinszahlungen
-  )}&nbsp;€ Zinsen an ihre Bank gezahlt. Familie Mietus hingegen hat insgesamt ${prettifyNumber(
+  )}&nbsp;€</li><li>Kapitalertragssteuer ${prettifyNumber(
+    kontoKapitalertragsteuerKaufus
+  )}&nbsp;€</li></ul><p>Für Familie Mietus hingegen fielen folgende Kosten an:</p><ul><li>Mietzahlungen ${prettifyNumber(
     kontoMietzahlungen
-  )}&nbsp;€ an Kaltmiete gezahlt.</p>`;
+  )}&nbsp;€</li><li>Kapitalertragssteuer ${prettifyNumber(kontoKapitalertragsteuerMietus)}&nbsp;€</li></ul>`;
 
   if (resultKaufus > resultMietus) {
     detailsHTML += `<h2>Ist Kaufen also besser?</h2>`;
