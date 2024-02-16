@@ -167,7 +167,7 @@ function update() {
       } else if (monatlicheKostenKaufus < monatlicheKostenMietus) {
         detailsHTML += `<p>Familie Kaufus hatte diesen Monat also ${prettifyNumber(
           monatlicheKostenMax - monatlicheKostenKaufus
-        )}&nbsp;€ mehr übrig als Familie Kaufus. Diesen Überschuss legen sie in ihre Geldanlage an.</p>`;
+        )}&nbsp;€ mehr übrig als Familie Mietus. Diesen Überschuss legen sie in ihre Geldanlage an.</p>`;
       }
     }
 
