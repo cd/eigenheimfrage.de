@@ -20,7 +20,7 @@ function update() {
   const zeitraum = 50;
   const darlehen = (1 + kaufnebenkosten / 100) * kaufpreis - startkapital;
   const wertentwicklungFaktorMonat = wertentwicklung / 100 / 12 + 1;
-  const kapitalertragssteuer = 0.26375;
+  const kapitalertragssteuersatz = 0.26375;
   const steuerfreibetrag = 1000;
 
   const bankRate = Math.round((tilgungsrate / 100 / 12) * darlehen + (kreditzins / 100 / 12) * darlehen);
@@ -31,18 +31,14 @@ function update() {
 
   let kontoSchulden = darlehen;
   let kontoZinszahlungen = 0;
-  let kontoGeldanlageEinzahlungenKaufus = 0;
-  let kontoGeldanlageEinzahlungenMietus = startkapital;
-  let kontoGeldanlageRenditeKaufus = 0;
-  let kontoGeldanlageRenditeMietus = 0;
+  let kontoAktiensparplanEinzahlungenKaufus = 0;
+  let kontoAktiensparplanEinzahlungenMietus = startkapital;
+  let kontoAktiensparplanRenditeKaufus = 0;
+  let kontoAktiensparplanRenditeMietus = 0;
   let kontoMietzahlungen = 0;
   let kontoInstandhaltung = 0;
   let kontoKapitalertragsteuerKaufus = 0;
   let kontoKapitalertragsteuerMietus = 0;
-  let kontoKapitalertragsteuerFreibetragKaufus = 0;
-  let kontoKapitalertragsteuerFreibetragMietus = 0;
-  let jahresfreibetragVerbleibendKaufus = 0;
-  let jahresfreibetragVerbleibendMietus = 0;
   let wertImmobilie = kaufpreis;
   let vermoegenKaufus = startkapital;
   let vermoegenMietus = startkapital;
@@ -66,13 +62,10 @@ function update() {
   )} %.</p><p>Familie Mietus hingegen hat einen Mietvertrag für eine identische Immobilie abgeschlossen. Ihre Jahreskaltmiete beträgt ${prettifyNumber(
     mietrendite,
     2
-  )} % des Immobilienwertes. Ihr Startkapital legen sie in eine Geldanlage mit einer Jahresrendite von ${prettifyNumber(
+  )} % des Immobilienwertes. Ihr Startkapital investieren sie in einen Aktien-ETF mit einer Wertsteigerung von ${prettifyNumber(
     anlagezins,
     2
-  )} % an.</p><p>Bei gleichem Einkommen und unterschiedlich hohen monatlichen Fixkosten hat entweder Familie Kaufus mehr Geld am Ende des Monats übrig (häufig ist das erst der Fall, wenn das Darlehen zurückgezahlt wurde), oder aber Familie Mietus. Diesen Überschuss legt die jeweilige Familie dann ebenfalls mit einer Rendite von ${prettifyNumber(
-    anlagezins,
-    2
-  )} % an. Fallen diese Renditen an, werden sie von beiden Familien direkt wieder angelegt.</p>`;
+  )} % pro Jahr.</p><p>Bei gleichem Einkommen und unterschiedlich hohen monatlichen Fixkosten hat entweder Familie Kaufus mehr Geld am Ende des Monats übrig (häufig ist das erst der Fall, wenn das Darlehen zurückgezahlt wurde), oder aber Familie Mietus. Diesen Überschuss investiert die jeweilige Familie dann ebenfalls in den erwähnten Aktien-ETF.</p>`;
 
   detailsHTML += `</p>`;
 
@@ -94,49 +87,35 @@ function update() {
     kontoMietzahlungen += miete;
 
     // Entweder Familie Kaufus oder Familie Mietus haben diesen Monat mehr Geld zur Verfügung.
-    // Dieses Geld wird direkt in die Geldanlage investiert.
+    // Dieses Geld wird direkt in den Aktiensparplan investiert.
     const monatlicheKostenKaufus = zinszahlung + tilgung + instandhaltungskosten;
     const monatlicheKostenMietus = miete;
     const monatlicheKostenMax = Math.max(monatlicheKostenKaufus, monatlicheKostenMietus);
-    kontoGeldanlageEinzahlungenMietus += monatlicheKostenMax - monatlicheKostenMietus;
-    kontoGeldanlageEinzahlungenKaufus += monatlicheKostenMax - monatlicheKostenKaufus;
+    kontoAktiensparplanEinzahlungenMietus += monatlicheKostenMax - monatlicheKostenMietus;
+    kontoAktiensparplanEinzahlungenKaufus += monatlicheKostenMax - monatlicheKostenKaufus;
 
-    // Bei beiden Familien wird zusätzlich jegliche Rendite, die aus der Geldanlage stammt, reinvestiert.
+    // Bei beiden Familien wird zusätzlich jegliche Rendite, die aus der Aktiensparplan stammt, reinvestiert.
     // Dieses Geld wird auf einem Extra-Konto geführt, damit man in der Auswertung die Rendite berechnen kann.
     // Weiterhin fällt auf die Reinvestition noch eine Steuer an, sofern der Jahresfreibetrag überschritten ist.
-    if (monat % 12 === 0) {
-      // Neues Jahr - neuer Freibetrag
-      jahresfreibetragVerbleibendKaufus = steuerfreibetrag;
-      jahresfreibetragVerbleibendMietus = steuerfreibetrag;
-    }
     const renditeKaufusBrutto =
-      (kontoGeldanlageRenditeKaufus + kontoGeldanlageEinzahlungenKaufus) * (anlagezins / 100 / 12);
+      (kontoAktiensparplanRenditeKaufus + kontoAktiensparplanEinzahlungenKaufus) * (anlagezins / 100 / 12);
     const renditeMietusBrutto =
-      (kontoGeldanlageRenditeMietus + kontoGeldanlageEinzahlungenMietus) * (anlagezins / 100 / 12);
-    const zuVersteuerndeRenditeKaufus = Math.max(renditeKaufusBrutto - jahresfreibetragVerbleibendKaufus, 0);
-    const zuVersteuerndeRenditeMietus = Math.max(renditeMietusBrutto - jahresfreibetragVerbleibendMietus, 0);
-    const genutzterFreibetragKaufus = renditeKaufusBrutto - zuVersteuerndeRenditeKaufus;
-    const genutzterFreibetragMietus = renditeMietusBrutto - zuVersteuerndeRenditeMietus;
-    jahresfreibetragVerbleibendKaufus -= genutzterFreibetragKaufus;
-    jahresfreibetragVerbleibendMietus -= genutzterFreibetragMietus;
-    const zuZahlendeSteuerKaufus = zuVersteuerndeRenditeKaufus * kapitalertragssteuer;
-    const zuZahlendeSteuerMietus = zuVersteuerndeRenditeMietus * kapitalertragssteuer;
-    kontoKapitalertragsteuerFreibetragKaufus += genutzterFreibetragKaufus;
-    kontoKapitalertragsteuerFreibetragMietus += genutzterFreibetragMietus;
-    kontoKapitalertragsteuerKaufus += zuZahlendeSteuerKaufus;
-    kontoKapitalertragsteuerMietus += zuZahlendeSteuerMietus;
-    kontoGeldanlageRenditeKaufus += renditeKaufusBrutto - zuZahlendeSteuerKaufus;
-    kontoGeldanlageRenditeMietus += renditeMietusBrutto - zuZahlendeSteuerMietus;
+      (kontoAktiensparplanRenditeMietus + kontoAktiensparplanEinzahlungenMietus) * (anlagezins / 100 / 12);
+    kontoAktiensparplanRenditeKaufus += renditeKaufusBrutto;
+    kontoAktiensparplanRenditeMietus += renditeMietusBrutto;
 
-    // Am Ende des Betrachtungszeitraums werden die Geldanlagen aufgelöst und auf die Gewinne fallen Steuern an.
+    // Am Ende des Betrachtungszeitraums werden die Aktien aufgelöst und auf die Gewinne fallen Steuern an.
     if (zeitraum * 12 === monat) {
-      kontoGeldanlageRenditeKaufus *= 1 - kapitalertragssteuer;
-      kontoGeldanlageRenditeMietus *= 1 - kapitalertragssteuer;
+      kontoKapitalertragsteuerKaufus = (kontoAktiensparplanRenditeKaufus - steuerfreibetrag) * kapitalertragssteuersatz;
+      kontoKapitalertragsteuerMietus = (kontoAktiensparplanRenditeMietus - steuerfreibetrag) * kapitalertragssteuersatz;
+      kontoAktiensparplanRenditeKaufus -= kontoKapitalertragsteuerKaufus;
+      kontoAktiensparplanRenditeMietus -= kontoKapitalertragsteuerMietus;
     }
 
     // Berechnung der Vermögen
-    vermoegenKaufus = wertImmobilie + kontoGeldanlageEinzahlungenKaufus + kontoGeldanlageRenditeKaufus - kontoSchulden;
-    vermoegenMietus = kontoGeldanlageEinzahlungenMietus + kontoGeldanlageRenditeMietus;
+    vermoegenKaufus =
+      wertImmobilie + kontoAktiensparplanEinzahlungenKaufus + kontoAktiensparplanRenditeKaufus - kontoSchulden;
+    vermoegenMietus = kontoAktiensparplanEinzahlungenMietus + kontoAktiensparplanRenditeMietus;
 
     // Neuer Immobilienwert (für nächsten Monat)
     wertImmobilie *= wertentwicklungFaktorMonat;
@@ -163,11 +142,11 @@ function update() {
       if (monatlicheKostenKaufus > monatlicheKostenMietus) {
         detailsHTML += `<p>Familie Mietus hatte diesen Monat also ${prettifyNumber(
           monatlicheKostenMax - monatlicheKostenMietus
-        )}&nbsp;€ mehr übrig als Familie Kaufus. Diesen Überschuss legen sie in ihre Geldanlage an.</p>`;
+        )}&nbsp;€ mehr übrig als Familie Kaufus. Diesen Überschuss investieren sie in ihren Aktien-ETF.</p>`;
       } else if (monatlicheKostenKaufus < monatlicheKostenMietus) {
         detailsHTML += `<p>Familie Kaufus hatte diesen Monat also ${prettifyNumber(
           monatlicheKostenMax - monatlicheKostenKaufus
-        )}&nbsp;€ mehr übrig als Familie Mietus. Diesen Überschuss legen sie in ihre Geldanlage an.</p>`;
+        )}&nbsp;€ mehr übrig als Familie Mietus. Diesen Überschuss investieren sie in ihren Aktien-ETF.</p>`;
       }
     }
 
@@ -201,33 +180,26 @@ function update() {
       detailsHTML += `<p>Das Vermögen der Familie Kaufus beträgt (abzüglich des noch offenen Darlehensbetrages von ${prettifyNumber(
         kontoSchulden
       )}&nbsp;€) jetzt ${prettifyNumber(vermoegenKaufus)}&nbsp;€. Bisher konnten sie ${
-        kontoGeldanlageEinzahlungenKaufus > 0
-          ? prettifyNumber(kontoGeldanlageEinzahlungenKaufus + kontoGeldanlageRenditeKaufus) + "&nbsp;€"
+        kontoAktiensparplanEinzahlungenKaufus > 0
+          ? prettifyNumber(kontoAktiensparplanEinzahlungenKaufus + kontoAktiensparplanRenditeKaufus) + "&nbsp;€"
           : "noch nichts"
-      } in ihre Geldanlage investieren.</p><p>Familie Mietus hingegen konnte mit ihrer Geldanlage inzwischen ein Vermögen von ${prettifyNumber(
-        kontoGeldanlageEinzahlungenMietus + kontoGeldanlageRenditeMietus
-      )}&nbsp;€ aufbauen. Sie mussten ${prettifyNumber(
-        kontoKapitalertragsteuerMietus
-      )}&nbsp;€ Kapitalertragsteuer bezahlen.</p><p>Grundsätzlich müssen beide Familien eine Kapitalertragsteuer von ${prettifyNumber(
-        kapitalertragssteuer * 100,
-        2
-      )}&nbsp;% (Solidaritätszuschlag mit inbegriffen) auf die Rendite ihrer Geldanlage bezahlen. Die ersten ${prettifyNumber(
-        steuerfreibetrag
-      )}&nbsp;€ im Jahr sind jedoch steuerfrei.</p><h2>Vermögensentwicklung über die Jahre</h2><canvas id="myChart"></canvas>`;
+      } in ihren Aktien-ETF investieren.</p><p>Familie Mietus hingegen konnte mit ihren Aktien inzwischen ein Vermögen von ${prettifyNumber(
+        kontoAktiensparplanEinzahlungenMietus + kontoAktiensparplanRenditeMietus
+      )}&nbsp;€ aufbauen.</p><h2>Vermögensentwicklung über die Jahre</h2><canvas id="myChart"></canvas>`;
     }
 
     if (!meldungSchuldenfrei && kontoSchulden < 1) {
       meldungSchuldenfrei = `<p>Nach ${prettifyNumber(
         monat / 12,
         1
-      )} Jahren hat Familie Kaufus das Darlehen vollständig zurückgezahlt. Von nun an müssen sie nur noch die Instandhaltungskosten der Immobilie tragen und können mehr Geld in ihre Geldanlage investieren.</p>`;
+      )} Jahren hat Familie Kaufus das Darlehen vollständig zurückgezahlt. Von nun an müssen sie nur noch die Instandhaltungskosten der Immobilie tragen und können mehr Geld in ihren Aktien-ETF investieren.</p>`;
     }
   }
 
   if (meldungSchuldenfrei) {
     detailsHTML += meldungSchuldenfrei;
   } else {
-    detailsHTML += `<p>Über den gesamten Zeitzeit hat Familie Kaufus es nicht geschafft, das Darlehen vollständig zurückzuzahlen. Nach 50 Jahren ist noch ein Betrag von ${prettifyNumber(
+    detailsHTML += `<p>Über den gesamten Zeitraum hat Familie Kaufus es nicht geschafft, das Darlehen vollständig zurückzuzahlen. Nach 50 Jahren ist noch ein Betrag von ${prettifyNumber(
       kontoSchulden
     )}&nbsp;€ offen.</p>`;
   }
@@ -240,13 +212,13 @@ function update() {
     wertImmobilie
   )}&nbsp;€ (${prettifyNumber(
     ((wertImmobilie - kaufpreis) / kaufpreis) * 100
-  )} % Wertsteigerung)</li><li>Auflösung Geldanlage ${prettifyNumber(
-    kontoGeldanlageEinzahlungenKaufus + kontoGeldanlageRenditeKaufus / (1 - kapitalertragssteuer)
+  )} % Wertsteigerung)</li><li>Aktienverkauf ${prettifyNumber(
+    kontoAktiensparplanEinzahlungenKaufus + kontoAktiensparplanRenditeKaufus + kontoKapitalertragsteuerKaufus
   )}&nbsp;€ (${prettifyNumber(
-    (100 * kontoGeldanlageRenditeKaufus) / (1 - kapitalertragssteuer) / kontoGeldanlageEinzahlungenKaufus
+    (100 * (kontoAktiensparplanRenditeKaufus + kontoKapitalertragsteuerKaufus)) / kontoAktiensparplanEinzahlungenKaufus
   )} % Rendite)</li><li>abzgl. ${prettifyNumber(
-    (kontoGeldanlageRenditeKaufus / (1 - kapitalertragssteuer)) * kapitalertragssteuer
-  )}&nbsp;€ Kapitalertragsteuer</li>${
+    kontoKapitalertragsteuerKaufus
+  )}&nbsp;€ Kapitalertragsteuer und Solidaritätszuschlag</li>${
     kontoSchulden > 0
       ? `<li>abzgl. Restschuld ${prettifyNumber(
           kontoSchulden
@@ -254,13 +226,13 @@ function update() {
       : ``
   }<li><strong>Guthaben: ${prettifyNumber(
     vermoegenKaufus
-  )}&nbsp;€</strong></li></ul><p>Familie Mietus:</p><ul><li>Auflösung Geldanlage ${prettifyNumber(
-    kontoGeldanlageEinzahlungenMietus + kontoGeldanlageRenditeMietus / (1 - kapitalertragssteuer)
+  )}&nbsp;€</strong></li></ul><p>Familie Mietus:</p><ul><li>Aktienverkauf ${prettifyNumber(
+    kontoAktiensparplanEinzahlungenMietus + kontoAktiensparplanRenditeMietus + kontoKapitalertragsteuerMietus
   )} € (${prettifyNumber(
-    (100 * kontoGeldanlageRenditeMietus) / (1 - kapitalertragssteuer) / kontoGeldanlageEinzahlungenMietus
+    (100 * (kontoAktiensparplanRenditeMietus + kontoKapitalertragsteuerMietus)) / kontoAktiensparplanEinzahlungenMietus
   )} % Rendite)</li><li>abzgl. ${prettifyNumber(
-    (kontoGeldanlageRenditeMietus / (1 - kapitalertragssteuer)) * kapitalertragssteuer
-  )}&nbsp;€ Kapitalertragsteuer</li><li><strong>Guthaben: ${prettifyNumber(
+    kontoKapitalertragsteuerMietus
+  )}&nbsp;€ Kapitalertragsteuer und Solidaritätszuschlag</li><li><strong>Guthaben: ${prettifyNumber(
     vermoegenMietus
   )}&nbsp;€</strong></li></ul>`;
 
@@ -286,11 +258,13 @@ function update() {
     kontoInstandhaltung
   )}&nbsp;€</li><li>Zinszahlungen ${prettifyNumber(
     kontoZinszahlungen
-  )}&nbsp;€</li><li>Kapitalertragsteuer ${prettifyNumber(
+  )}&nbsp;€</li><li>Kapitalertragsteuer und Solidaritätszuschlag ${prettifyNumber(
     kontoKapitalertragsteuerKaufus
   )}&nbsp;€</li></ul><p>Für Familie Mietus hingegen fielen folgende Kosten an:</p><ul><li>Mietzahlungen ${prettifyNumber(
     kontoMietzahlungen
-  )}&nbsp;€</li><li>Kapitalertragsteuer ${prettifyNumber(kontoKapitalertragsteuerMietus)}&nbsp;€</li></ul>`;
+  )}&nbsp;€</li><li>Kapitalertragsteuer und Solidaritätszuschlag ${prettifyNumber(
+    kontoKapitalertragsteuerMietus
+  )}&nbsp;€</li></ul>`;
 
   if (resultKaufus > resultMietus) {
     detailsHTML += `<h2>Ist Kaufen also besser?</h2>`;

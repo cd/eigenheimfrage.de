@@ -152,16 +152,18 @@
           </p>
         </div>
         <div class="setting-wrapper">
-          <label for="anlagezins">Jahresrendite der Geldanlage</label>
+          <label for="anlagezins">Wertsteigerung des Aktien-ETF pro Jahr</label>
           <div class="input-wrapper">
             <input type="number" id="anlagezins" step="0.1" value="9.0" min="0" max="25" />
             <span>%</span>
           </div>
           <p class="desc">
-            Sowohl Familie Kaufus als auch Familie Mietus legen das Geld, was sie am Monatsende mehr zur Verfügung
-            haben als die jeweils andere Familie, in eine Geldanlage an. Beispielsweise kann es sich hierbei um einen
-            Aktiensparplan handeln. Welche jährliche Rendite soll hier angenommen werden? Der voreingestellte Wert
-            entspricht in etwa der durchschnittlichen Jahresrendite des MSCI World Index über die letzten 50 Jahre.
+            Sowohl Familie Kaufus als auch Familie Mietus investieren das Geld, was sie am Monatsende mehr zur Verfügung
+            haben als die jeweils andere Familie, in einen Indexfonds. Welche jährliche Wertsteigerung soll hier
+            angenommen werden? Der voreingestellte Wert entspricht in etwa der durchschnittlichen Jahresrendite des MSCI
+            World Index über die letzten 50 Jahre. Wir gehen von einen thesaurierenden ETF aus, sodass Dividenden
+            automatisch reinvestiert werden und ggf. anfallende Steuern so gering sind, dass sie an dieser Stelle
+            ignoriert werden.
           </p>
         </div>
       </div>
@@ -173,12 +175,11 @@
         398.000&nbsp;€ aufnehmen. Ihre Bank gewährt ihnen das Darlehen mit einem effektiven Zinssatz von 4,00 % und
         einer anfänglichen Tilgungsrate von 1,50 %.</p>
       <p>Familie Mietus hingegen hat einen Mietvertrag für eine identische Immobilie abgeschlossen. Ihre Jahreskaltmiete
-        beträgt 5,00 % des Immobilienwertes. Ihr Startkapital legen sie in eine Geldanlage mit einer Jahresrendite von
-        9,00 % an.</p>
+        beträgt 5,00 % des Immobilienwertes. Ihr Startkapital investieren sie in einen Aktien-ETF mit einer
+        Wertsteigerung von 9,00 % pro Jahr.</p>
       <p>Bei gleichem Einkommen und unterschiedlich hohen monatlichen Fixkosten hat entweder Familie Kaufus mehr Geld am
         Ende des Monats übrig (häufig ist das erst der Fall, wenn das Darlehen zurückgezahlt wurde), oder aber Familie
-        Mietus. Diesen Überschuss legt die jeweilige Familie dann ebenfalls mit einer Rendite von 9,00 % an. Fallen
-        diese Renditen an, werden sie von beiden Familien direkt wieder angelegt.</p>
+        Mietus. Diesen Überschuss investiert die jeweilige Familie dann ebenfalls in den erwähnten Aktien-ETF.</p>
       <p></p>
       <h2>Zwischenstand nach einem Monat</h2>
       <p>Im ersten Monat kamen beide Familien ihren Verpflichtungen nach.</p>
@@ -186,23 +187,19 @@
         und eine Zinszahlung von 1.327&nbsp;€ (73 %). Weiterhin mussten sie über den Monat Ihre Immobilie mit 333&nbsp;€
         instand halten.</p>
       <p>Familie Mietus hingegen hat ihrem Vermieter eine Kaltmiete von 1.667&nbsp;€ gezahlt.</p>
-      <p>Familie Mietus hatte diesen Monat also 491&nbsp;€ mehr übrig als Familie Kaufus. Diesen Überschuss legen sie in
-        ihre Geldanlage an.</p>
+      <p>Familie Mietus hatte diesen Monat also 491&nbsp;€ mehr übrig als Familie Kaufus. Diesen Überschuss investieren
+        sie in ihren Aktien-ETF.</p>
       <h2>Zwischenstand nach einem Jahr</h2>
       <p>Der Wert der Immobilie hat sich inzwischen auf 406.447&nbsp;€ gesteigert (+1,61 %). Das hat Folge, dass Familie
         Kaufus monatlich nun 338&nbsp;€ aufbringen muss, um die Immobilie instand zu halten. Familie Mietus hingegen
         muss nun monatlich 1.691&nbsp;€ an Kaltmiete bezahlen.</p>
       <p>Das Vermögen der Familie Kaufus beträgt (abzüglich des noch offenen Darlehensbetrages von 391.921&nbsp;€) jetzt
-        13.985&nbsp;€. Bisher konnten sie noch nichts in ihre Geldanlage investieren.</p>
-      <p>Familie Mietus hingegen konnte mit ihrer Geldanlage inzwischen ein Vermögen von 59.515&nbsp;€ aufbauen. Sie
-        mussten 1.183&nbsp;€ Kapitalertragsteuer bezahlen.</p>
-      <p>Grundsätzlich müssen beide Familien eine Kapitalertragsteuer von 26,38&nbsp;% (Solidaritätszuschlag mit
-        inbegriffen) auf die Rendite ihrer Geldanlage bezahlen. Die ersten 1.000&nbsp;€ im Jahr sind jedoch steuerfrei.
-      </p>
-      <h2>Vermögensentwicklung über die Jahre</h2><canvas id="myChart" width="800" height="400"
+        13.985&nbsp;€. Bisher konnten sie noch nichts in ihren Aktien-ETF investieren.</p>
+      <p>Familie Mietus hingegen konnte mit ihren Aktien inzwischen ein Vermögen von 60.752&nbsp;€ aufbauen.</p>
+      <h2>Vermögensentwicklung über die Jahre</h2><canvas id="myChart" width="1200" height="600"
         style="display: block; box-sizing: border-box; height: 400px; width: 800px;"></canvas>
       <p>Nach 32,6 Jahren hat Familie Kaufus das Darlehen vollständig zurückgezahlt. Von nun an müssen sie nur noch die
-        Instandhaltungskosten der Immobilie tragen und können mehr Geld in ihre Geldanlage investieren.</p>
+        Instandhaltungskosten der Immobilie tragen und können mehr Geld in ihren Aktien-ETF investieren.</p>
       <h2>Ergebnis nach 50 Jahren</h2>
       <p>Beide Familien sind mit 50.000&nbsp;€ gestartet. Um beide Szenanieren am Ende des Betrachtungszeitraumes wieder
         sinnvoll miteinander vergleichen zu können, verkaufen beide Familien ihr Hab und Gut und machen einen
@@ -210,31 +207,32 @@
       <p>Familie Kaufus:</p>
       <ul>
         <li>(Steuerfreier) Immobilienverkauf 889.742&nbsp;€ (122 % Wertsteigerung)</li>
-        <li>Auflösung Geldanlage 1.147.443&nbsp;€ (100 % Rendite)</li>
-        <li>abzgl. 151.505&nbsp;€ Kapitalertragsteuer</li>
-        <li><strong>Guthaben: 1.884.496&nbsp;€</strong></li>
+        <li>Aktienverkauf 1.496.801&nbsp;€ (161 % Rendite)</li>
+        <li>abzgl. 243.384&nbsp;€ Kapitalertragsteuer und Solidaritätszuschlag</li>
+        <li><strong>Guthaben: 2.141.974&nbsp;€</strong></li>
       </ul>
       <p>Familie Mietus:</p>
       <ul>
-        <li>Auflösung Geldanlage 2.578.868 € (2.224 % Rendite)</li>
-        <li>abzgl. 650.914&nbsp;€ Kapitalertragsteuer</li>
-        <li><strong>Guthaben: 1.927.954&nbsp;€</strong></li>
+        <li>Aktienverkauf 7.641.471 € (6.787 % Rendite)</li>
+        <li>abzgl. 1.985.912&nbsp;€ Kapitalertragsteuer und Solidaritätszuschlag</li>
+        <li><strong>Guthaben: 5.655.560&nbsp;€</strong></li>
       </ul>
-      <p style="border:1px solid black;padding: 0.5em;background-color:#e5f0f7;"><strong>Beide Familien konnten im
-          gleichen Zeitraum bei gleichen Startbedingungen in etwa gleich viel Vermögen aufbauen.</strong></p>
+      <p style="border:1px solid black;padding: 0.5em;background-color:#e5f0f7;"><strong>Familie Mietus konnte im
+          gleichen Zeitraum bei gleichen Startbedingungen also 2,6-mal so viel Vermögen aufbauen wie Familie
+          Kaufus.</strong></p>
       <p>Während des gesamten Zeitraumes fielen für Familie Kaufus folgende Kosten an:</p>
       <ul>
         <li>Kaufnebenkosten 48.000&nbsp;€</li>
         <li>Instandhaltungskosten 306.089&nbsp;€</li>
         <li>Zinszahlungen 314.286&nbsp;€</li>
-        <li>Kapitalertragsteuer 196.283&nbsp;€</li>
+        <li>Kapitalertragsteuer und Solidaritätszuschlag 243.384&nbsp;€</li>
       </ul>
       <p>Für Familie Mietus hingegen fielen folgende Kosten an:</p>
       <ul>
         <li>Mietzahlungen 1.530.444&nbsp;€</li>
-        <li>Kapitalertragsteuer 866.182&nbsp;€</li>
+        <li>Kapitalertragsteuer und Solidaritätszuschlag 1.985.912&nbsp;€</li>
       </ul>
-      <h2>Ist Kaufen oder Mieten nun besser?</h2>
+      <h2>Ist Mieten also besser?</h2>
     </div>
     <p>Am Ende handelt es sich um eine vereinfachte Rechnung mit konstanten Parametern. In der Realität gibt es diese
       Konstanz nicht, dafür aber viele Unsicherheiten:</p>
@@ -244,7 +242,7 @@
       <li>Je nach Situation kann die Bank eine Nachbesicherung einfordern.</li>
       <li>Die Wertentwicklung der Immobilie ist von vielen, nicht beeinflussbaren Faktoren abhängig:
         demografischer Wandel, Nachbarschaft, wirtschaftliche und politische Situation, Gesetzgebung, etc.</li>
-      <li>Aber auch die Geldanlage ist stark von der wirtschaftlichen und politischen Situation abhängig.</li>
+      <li>Aber auch die Werte der Aktien sind stark von der wirtschaftlichen und politischen Situation abhängig.</li>
       <li>Es ist nicht absehbar, inwieweit sich die steuerlichen Aspekte ändern werden.</li>
     </ul>
     <p>Weiterhin kommt es auch auf die persönliche Einstellung an:</p>
@@ -266,8 +264,8 @@
       Er ist nicht abhängig vom aktuellen Immobilienmarkt, braucht keine Vorfälligkeitsentschädigungen zu bezahlen und
       braucht sich auch nicht um einen Käufer und das ganze Drum-Herum zu kümmern. Im Gegenteil: Der Mieter kann
       relativ unkompliziert die eigene Wohnung an seine Lebenssituation anpassen. Auch muss er bei einem finanziellen
-      Engpass nicht gleich alles verkaufen, sondern kann in der Regel schnell und nach Bedarf seine Geldanlage
-      anteilig auflösen.</p>
+      Engpass nicht gleich alles verkaufen, sondern kann in der Regel schnell und nach Bedarf seine Aktien
+      anteilig veräußern.</p>
     <p>Weiterhin investieren Eigenheimbesitzer in der Regel deutlich mehr in den Bereich Wohnen durch
       Individualisierung und Anpassungen nach persönlichen Bedürfnissen. Diese Anpassungen werden bei einem Verkauf
       jedoch kaum den Bedürfnissen des Käufers entsprechen. Folglich wird der Verkäufer auch nicht den für ihn
