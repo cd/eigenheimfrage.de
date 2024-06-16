@@ -158,7 +158,7 @@ function update() {
         )}&nbsp;€ gesteigert (+${prettifyNumber(
           (100 * (wertImmobilie - kaufpreis)) / kaufpreis,
           2
-        )} %). Das hat Folge, dass Familie Kaufus monatlich nun ${prettifyNumber(
+        )} %). Das hat zur Folge, dass Familie Kaufus monatlich nun ${prettifyNumber(
           instandhaltungskosten
         )}&nbsp;€ aufbringen muss, um die Immobilie instand zu halten. Familie Mietus hingegen muss nun monatlich ${prettifyNumber(
           miete
@@ -169,7 +169,7 @@ function update() {
         )}&nbsp;€ gefallen (-${prettifyNumber(
           (100 * (kaufpreis - wertImmobilie)) / kaufpreis,
           2
-        )} %). Das hat Folge, dass Familie Kaufus monatlich nun ${prettifyNumber(
+        )} %). Das hat zur Folge, dass Familie Kaufus monatlich nun ${prettifyNumber(
           instandhaltungskosten
         )}&nbsp;€ aufbringen muss, um die Immobilie instand zu halten. Familie Mietus hingegen muss nun monatlich ${prettifyNumber(
           miete
